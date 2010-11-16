@@ -1,0 +1,29 @@
+\begin{thebibliography}{1}\setlength{\itemsep}{-1ex}\small
+
+\bibitem{CACTI}
+{HP Labs}.
+\newblock {CACTI}, http://www.hpl.hp.com/research/cacti/.
+\newblock 2010.
+
+\bibitem{Magnusson:2002:simics-orig-paper}
+P.~S. Magnusson, M.~Christensson, J.~Eskilson, D.~Forsgren, G.~Hallberg,
+  J.~Hogberg, F.~Larsson, A.~Moestedt, and B.~Werner.
+\newblock Simics: a full system simulation platform.
+\newblock {\em IEEE Transactions on Computer}, 35(2):50--58, 2002.
+
+\bibitem{NPB}
+{NASA}.
+\newblock {NPB}, http://www.nas.nasa.gov/resources/software/npb.html.
+
+\bibitem{SPEC:2006}
+{SPEC}.
+\newblock {SPEC CPU2006}, http://www.spec.org/cpu2006/.
+
+\bibitem{Sun:2009:MRAM-L2-CMP}
+G.~Sun, X.~Dong, Y.~Xie, J.~Li, and Y.~Chen.
+\newblock A novel architecture of the {3D} stacked {MRAM} {L2} cache for
+  {CMPs}.
+\newblock In {\em Proceedings of the International Conference on
+  High-Performance Computer Architecture}, pages 239--249, 2009.
+
+\end{thebibliography}
