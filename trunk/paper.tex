@@ -123,12 +123,7 @@ Memristor, a portmanteau of ``memory resistor'', is a generalized resistance tha
 
 % -----------------------------------------------------------------------------
 \section{Memory Technology Pre-Exploration}
-
-We use our modified CACTI~\cite{CACTI} to estimate the bandwidths provided
-by different memory technologies.
-
-In this section, we describe the experimental results we have obtained so far
-using a modified version of CACTI~\cite{CACTI}. \vspace{-0.5in}
+Many modeling tools have been developed during the last decade to enable system-level design exploration for SRAM- or DRAM-based cache and memory design.  For example, CACTI~\cite{CACTI} is a tool that has been widely used in the computer architecture community to estimate the speed, power, and area of SRAM and DRAM caches. In addition, CACTI has also been extended to evaluate the performance, power, and area for STT-RAM~\cite{CACTI:DAC08:Dong}, PCRAM~\cite{CACTI:GLSVLSI08:Mangalagiri,CACTI:PCRAMsim}, and NAND flash~\cite{CACTI:DATE10:Mohan}. However, as CACTI is originally designed to model SRAM-based cache, some of its fundamental assumptions do not match the actual NVM circuit implementation, and thereby these CACTI-like estimation tools do not model the NVM array organization in the exact way that the chip is fabricated. In this section, we use \emph{NVSim}, a circuit-level model for NVM performance, energy, and area estimation, which supports various NVM technologies including STT-RAM, PCRAM, RRAM, and conventional NAND flash.
 
 \begin{figure*}[htbp]
 % The "!" means to maintain the aspect ratio.
@@ -209,7 +204,7 @@ dynamic energy with 10\% write activities.
 
 % \bibliographystyle{IEEEtran}
 \bibliographystyle{latex8}
-\bibliography{./bib/ref,./bib/reram}
+\bibliography{./bib/ref,./bib/reram,./bib/cacti}
 
 \end{large}
 
