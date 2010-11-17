@@ -19,7 +19,7 @@
 
 \begin{document}
 
-\title{CSE530 Project Mid-Point Progress Report\\
+\title{CSE530 Project Final Report\\
 Bandwidth-Aware Memory Hierarchy Design with Hybrid Memory Technologies}
 
 \author{Cong Xu and Jishen Zhao\\
@@ -29,35 +29,15 @@ Bandwidth-Aware Memory Hierarchy Design with Hybrid Memory Technologies}
 
 \begin{large}
 
-% ------------------------------------------------------------------------------
+\begin{abstract}
+\boldmath
 
-\section{Project Description}
 
-One of the challenges for modern chip-multiprocessor~(CMP) design is the growing bandwidth gap
-between processor cores and off-chip main memory. Emerging memory technologies
-bring in potential opportunities to fill this gap. The memory hierarchy,
-however, need to be carefully designed in order to bridge the this gap with low
-performance and power overhead.
-
-In this project, we would like to explore the optimal memory hierarchy design
-with various memory technologies specifically for bandwidth-bounded
-applications. We will first estimate the performance of an application on a
-baseline system, in terms of the bandwidth demanded by the application for a
-range of memory capacities and the bandwidth that can be provided by the system
-with such memory capacities. We would like to find out whether the bandwidth
-provided by the memory hierarchy can satisfy the demand. If it is not satisfied,
-we can modify the memory hierarchy, for example, by changing the capacity of
-existing cache and memories, or by adding an extra level of cache or memory.
-Based on our exploration, we would like to find a memory hierarchy design
-solution optimized for bandwidth, including the number of cache and memory
-levels, as well as the memory technology, the bandwidth, and the capacity used
-for each level. In addition, we will enhance the memory hierarchy design from
-the energy-efficiency point of view by constraining the total power consumption
-of the memory system.\vspace{0.15in}
+\end{abstract}
 
 % ------------------------------------------------------------------------------
 
-\section{Motivation}
+\section{Introduction}
 
 Many of modern chip-multiprocessors are designed to perform well on various
 applications to achieve high performance by exploiting their inherent
@@ -72,16 +52,11 @@ the processing cores. However, if the working set does not fit in the on-die
 caches, the main memory needs to provide much of the data. Since the bandwidth
 of off-chip main memory is quite limited, applications with such working sets
 are potentially bandwidth-bound. Therefore, it is crucial to design the memory
-hierarchy to overcome the bandwidth limitation. 
+hierarchy to overcome the bandwidth limitation.
 
 It is known that performance improvement of a computing system can be achieved
 via multiple memory levels. Adding an extra level of memory, however, can also
-help alleviate the bandwidth bottleneck of off-chip memory. In addition,
-emerging memory technologies such as Magnetoresistive Random Access
-Memory~(MRAM), Phase-Change Memory~(PCM), Resistive Random Access Memory~(RRAM),
-etc., have shown potential to to be used as on-chip caches and the main
-memory~\cite{Sun:2009:MRAM-L2-CMP}. Therefore, we would like to explore how to
-enhance the memory hierarchy from the bandwidth point of view. Specifically, we
+help alleviate the bandwidth bottleneck of off-chip memory. Specifically, we
 would like to examine (1) the number of levels in the optimal memory hierarchy,
 (2) the appropriate memory technology of each level, and (3) the capacity and
 bandwidth of each level. We will also explore the energy-efficiency of the
@@ -89,7 +64,33 @@ memory hierarchy design constrain, and the memory hierarchy design within a
 fixed power budge.\vspace{0.15in}
 
 % -----------------------------------------------------------------------------
+\section{Motivation}
 
+Throughput computing involves performing a huge number of calculations with a large amount of parallelism. Throughput computing applications span many domains and are already critical on a variety of platforms from high-performance computing (HPC) machines to commercial servers to client machines.
+
+Systems designed to perform well on throughput computing applications achieve high performance by exploiting their inherent parallelism. These systems support large numbers of threads and/or use wide SIMD execution. This puts a lot of pressure on the memory system. Fortunately, memory latency is typically not a bottleneck since the latency can be hidden via multithreading or hardware prefetching, since the data access patterns are relatively simple. On the other hand, bandwidth is a potential bottleneck.
+
+Many throughput computing applications have inherently large working sets (i.e., tens to hundreds of MB). These are unlikely to fit in conventional on-die SRAM caches for the foreseeable future. Further, unlike more traditional workloads (e.g., those similar to SPEC or TPC benchmarks), many throughput computing applications see a sharp drop in performance once caches are too small to hold their working sets. Thus, these applications are likely to be bandwidth-bound at main memory unless some significant changes are made to the memory hierarchy.
+
+Unfortunately, there are few simple techniques to improve bandwidth efficiency of a system. While there is some work in this area~\cite{BW-Wall}, this is insufficient for the large bandwidth requirements of some throughput computing applications. So today¡¯s systems that tout good performance for throughput computing applications (e.g., nVidia¡¯s Tesla) do so by providing large main memory bandwidths via the use of GDDR rather than improving bandwidth efficiency. However, GDDR has fairly strict capacity limits and is much more power hungry than conventional DRAM modules. This reduces its desirability for throughput computing, and makes it a bad choice for general purpose systems trying to improve their throughput computing performance.
+
+Emerging memory technologies such as Magnetoresistive Random Access Memory~(MRAM), Phase-Change Memory~(PCM), Resistive Random Access Memory~(RRAM),
+embedded DRAM, have shown potential to to be used as on-chip caches and the main memory~\cite{Sun:2009:MRAM-L2-CMP}. Therefore, we explore how to enhance the memory hierarchy from the bandwidth point of view.
+
+
+% -----------------------------------------------------------------------------
+
+\section{Emerging Memory Technologies}
+
+We first review the technology background three types of non-volatile memories, which are STT-RAM, PCRAM, and RRAM.
+
+\subsection{STT-RAM}
+
+\subsection{PCRAM}
+
+\subsection{RRAM}
+
+% -----------------------------------------------------------------------------
 \section{Memory Technology Pre-Exploration}
 
 We use our modified CACTI~\cite{CACTI} to estimate the bandwidths provided
@@ -99,7 +100,7 @@ In this section, we describe the experimental results we have obtained so far
 using a modified version of CACTI~\cite{CACTI}. \vspace{-0.5in}
 
 \begin{figure*}[htbp]
-% The "!" means to maintain the aspect ratio.   
+% The "!" means to maintain the aspect ratio.
 \centering
 \includegraphics[width=3in]{figures/read-bw}
 \includegraphics[width=3in]{figures/write-bw}\\
@@ -116,7 +117,7 @@ provided by different memory technologies.}
 \end{figure*}
 
 \begin{figure*}[htbp]
-% The "!" means to maintain the aspect ratio.   
+% The "!" means to maintain the aspect ratio.
 \centering
 \includegraphics[width=2in]{figures/read-energy}
 \includegraphics[width=2in]{figures/write-energy}
@@ -153,7 +154,7 @@ bandwidth-aware hybrid memory hierarchy, which always provides the high memory
 bandwidth with the given capacity. For example, we probably would like to use
 1) SRAM when the memory capacity is under 256MB, 2) MRAM or RRAM between
 256MB and 1GB (if only bandwidth is considered), and 3) PCRAM when the memory
-cacity is over 1GB. 
+cacity is over 1GB.
 
 \section{Experiments}
 
@@ -181,4 +182,4 @@ dynamic energy with 10\% write activities.
 
 \end{large}
 
-\end{document}
+\end{document} 
