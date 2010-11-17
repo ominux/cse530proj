@@ -85,10 +85,41 @@ embedded DRAM, have shown potential to to be used as on-chip caches and the main
 We first review the technology background three types of non-volatile memories, which are STT-RAM, PCRAM, and RRAM.
 
 \subsection{STT-RAM}
+STT-RAM uses the magnetic property of the material and uses Magnetic Tunnel Junction (MTJ) as its binary storage.  As shown in Fig.~\ref{fig:mram_cell}, MTJ contains two ferromagnetic layers and one tunnel barrier layer. The direction of one ferromagnetic layer is fixed, which is called the reference layer, while the direction of the other one can be changed by passing a driving current, which is called the free layer. The relative magnetization direction of two ferromagnetic layers determines the resistance of MTJ.  If two ferromagnetic layers have the same directions, the resistance of MTJ is low, indicating a ``0" state; if two layers have different directions, the resistance of MTJ is high, indicating a ``1" state.
+
+\begin{figure*}[htbp]
+% The "!" means to maintain the aspect ratio.
+\centering
+\includegraphics[width=3in]{figures/mram_cell}
+\caption{Demonstration of a MRAM cell. (a) Structural view. (b) Schematic view.}
+\label{fig:mram_cell}
+\end{figure*}
 
 \subsection{PCRAM}
 
+PCRAM uses chalcogenide-based material to storage informations.  The chalcogenide-based materials in recent PCRAM research are usually alloys of germanium, antimony, and tellurium (GeSbTe, or GST), which can be switched between a crystalline phase (SET or ``1" state) and an amorphous phase (RESET or ``0" state) with the application of heat. The crystalline phase shows high optical reflectivity and low electrical resistivity, while the amorphous phase is characterized by low reflectivity and high resistivity.
+
+\begin{figure*}[htbp]
+% The "!" means to maintain the aspect ratio.
+\centering
+\includegraphics[width=3in]{figures/GST}
+\caption{The schematic view of a PCRAM cell with MOSFET selector transistor (BL=Bitline, WL=Wordline, SL=Sourceline}
+\label{fig:GST}
+\end{figure*}
+
 \subsection{RRAM}
+
+\begin{figure*}[htbp]
+% The "!" means to maintain the aspect ratio.
+\centering
+\includegraphics[width=3in]{figures/memristor}
+\caption{The conceptual view of the structure of memristor cells.}
+\label{fig:memristor}
+\end{figure*}
+
+Memristor, a portmanteau of ``memory resistor'', is a generalized resistance that maintains a functional relationship between the time integrals of current and voltage.  Memristor was first theoretically predicted by Chua in 1971~\cite{memristor:chua} as the fourth fundamental circuit element from the completeness of relations between the four basic circuit variables, namely, current, voltage, charge, and flux-linkage.  The first memristor practical demonstration was presented by Williams \emph{et al.} in 2008~\cite{memristor:missing}.  Fig.~\ref{fig:memristor} shows a conceptual view of the memristor structure~\cite{memristor:missing}. The top electrode and bottom electrode are two metal nanowires on platinum, and the thin titanium dioxide film is sandwiched by the electrodes.
+
+
 
 % -----------------------------------------------------------------------------
 \section{Memory Technology Pre-Exploration}
@@ -178,7 +209,7 @@ dynamic energy with 10\% write activities.
 
 % \bibliographystyle{IEEEtran}
 \bibliographystyle{latex8}
-\bibliography{./bib/ref}
+\bibliography{./bib/ref,./bib/reram}
 
 \end{large}
 
