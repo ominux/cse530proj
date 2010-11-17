@@ -1,4 +1,6 @@
-\documentclass[12pt,letterpaper, singlecolumn]{article}
+\documentclass[10pt,letterpaper,singlecolumn]{article}
+\usepackage{setspace}
+\doublespacing
 \usepackage{latex8}
 \usepackage{times}
 \usepackage{cite}
@@ -88,16 +90,10 @@ fixed power budge.\vspace{0.15in}
 
 % -----------------------------------------------------------------------------
 
-\section{Experimental Setup}
+\section{Memory Technology Pre-Exploration}
 
-We will use our modified CACTI~\cite{CACTI} to estimate the bandwidths provided
-by different memory technologies. We will also use
-Simics~\cite{Magnusson:2002:simics-orig-paper} as the simulator to evaluate our
-design method. The benchmarks will be selected from bandwidth-bound
-applications, which possibly include benchmarks from SPEC
-CPU2006~\cite{SPEC:2006} and NPB~\cite{NPB}.\vspace{0.15in}
-
-\section{Experiments}
+We use our modified CACTI~\cite{CACTI} to estimate the bandwidths provided
+by different memory technologies.
 
 In this section, we describe the experimental results we have obtained so far
 using a modified version of CACTI~\cite{CACTI}. \vspace{-0.5in}
@@ -158,6 +154,20 @@ bandwidth with the given capacity. For example, we probably would like to use
 1) SRAM when the memory capacity is under 256MB, 2) MRAM or RRAM between
 256MB and 1GB (if only bandwidth is considered), and 3) PCRAM when the memory
 cacity is over 1GB. 
+
+\section{Experiments}
+
+ We will also use
+Simics~\cite{Magnusson:2002:simics-orig-paper} as the simulator to evaluate our
+design method. The benchmarks will be selected from bandwidth-bound
+applications, which possibly include benchmarks from SPEC
+CPU2006~\cite{SPEC:2006} and NPB~\cite{NPB}.\vspace{0.15in}
+
+\subsection{Experimental Setup}
+
+\subsection{Results}
+
+\section{Conclusion and Future Work}
 
 In addition, we would like to put an upper bound to the total dynamic energy
 consumption of the memory hierarchy. Figure~\ref{fig:memory-energy} shows the
