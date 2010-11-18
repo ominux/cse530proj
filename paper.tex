@@ -16,6 +16,7 @@
 \usepackage[small,compact]{titlesec}
 \usepackage[small,it]{caption}
 \usepackage{wrapfig}
+\usepackage{enumerate}
 \usepackage{multirow}
 
 \begin{document}
@@ -120,8 +121,6 @@ PCRAM uses chalcogenide-based material to storage informations.  The chalcogenid
 
 Memristor, a portmanteau of ``memory resistor'', is a generalized resistance that maintains a functional relationship between the time integrals of current and voltage.  Memristor was first theoretically predicted by Chua in 1971~\cite{memristor:chua} as the fourth fundamental circuit element from the completeness of relations between the four basic circuit variables, namely, current, voltage, charge, and flux-linkage.  The first memristor practical demonstration was presented by Williams \emph{et al.} in 2008~\cite{memristor:missing}.  Fig.~\ref{fig:memristor} shows a conceptual view of the memristor structure~\cite{memristor:missing}. The top electrode and bottom electrode are two metal nanowires on platinum, and the thin titanium dioxide film is sandwiched by the electrodes.
 
-
-
 % -----------------------------------------------------------------------------
 \section{Memory Technology Pre-Exploration}
 Many modeling tools have been developed during the last decade to enable system-level design exploration for SRAM- or DRAM-based cache and memory design.  For example, CACTI~\cite{CACTI} is a tool that has been widely used in the computer architecture community to estimate the speed, power, and area of SRAM and DRAM caches. In addition, CACTI has also been extended to evaluate the performance, power, and area for STT-RAM~\cite{CACTI:DAC08:Dong}, PCRAM~\cite{CACTI:GLSVLSI08:Mangalagiri,CACTI:PCRAMsim}, and NAND flash~\cite{CACTI:DATE10:Mohan}. However, as CACTI is originally designed to model SRAM-based cache, some of its fundamental assumptions do not match the actual NVM circuit implementation, and thereby these CACTI-like estimation tools do not model the NVM array organization in the exact way that the chip is fabricated. In this section, we use \emph{NVSim}, a circuit-level model for NVM performance, energy, and area estimation, which supports various NVM technologies including STT-RAM, PCRAM, RRAM, and conventional NAND flash.
@@ -136,6 +135,9 @@ provided by different memory technologies.}
 \label{fig:memory-bw}
 \end{figure*}
 
+First of all, we estimate the read and write bandwidths that can be provided by different memory technologies. Figure~\ref{fig:memory-bw} shows the results, with both x- and y-values in \emph{log} scale. The figure illustrates both the
+provided read and write bandwidth as a function of memory capacity. Each of the memory technologies actually provide nearly the same read bandwidths, as is shown in figure~\ref{fig:memory-bw}(a). On the other hand, a straight forward observation from figure~\ref{fig:memory-bw}(b) is that the write bandwidth varies among different memory technologies. The shape of the SRAM write bandwidth curve is very similar to the read bandwidth curve. The write bandwidth curves of the other three memory technologies appear to be very different. The reason is that write latencies of the three non-volatile memories are much higher than read latencies. Another observation from figure~\ref{fig:memory-bw}(b) is that the curves cross to each other at different locations.
+
 \begin{figure*}[htbp]
 % The "!" means to maintain the aspect ratio.
 \centering
@@ -143,30 +145,24 @@ provided by different memory technologies.}
 \caption{Dynamic energy consumption with the provided bandwidths of different
   memory technologies. (a) Dynamic Energy with 20\% write.  (b) Dynamic Energy with 50\% write. }
 \label{fig:memory-energy}
-\end{figure*}
-
-\begin{figure*}[htbp]
-% The "!" means to maintain the aspect ratio.
-\centering
 \includegraphics[width=6in]{figures/RAM_latency}
 \caption{Latency of different memory technologies. (a) Read Latency. (b) Write Latency.}
-\label{fig:latency}
+\label{fig:memory-latency}
 \end{figure*}
 
-First of all, we estimate the read and write bandwidths that can be provided by
-different memory technologies. Figure~\ref{fig:memory-bw} shows the results,
-with both x- and y-values in \emph{log} scale. The figure illustrates both the
-provided read and write bandwidth as a function of memory capacity. Each of the
-memory technologies actually provide nearly the same read bandwidths, as is
-shown in figure~\ref{fig:memory-bw}(a). On the other hand, a straight forward
-observation from figure~\ref{fig:memory-bw}(b) is that the write bandwidth
-varies among different memory technologies. The shape of the SRAM write
-bandwidth curve is very similar to the read bandwidth curve. The write bandwidth
-curves of the other three memory technologies appear to be very different. The
-reason is that write latencies of the three non-volatile memories are much
-higher than read latencies. Another observation from
-figure~\ref{fig:memory-bw}(b) is that the curves cross to each other at
-different locations. Based on these two observations, we would like to design a
+Being aware that the read and write latencies of NVM are asymmetric, we consider the read latency at first. In NVsim, we divide the entire cache read latency into the following components:
+\begin{itemize}
+\item (a)	H-tree input delay
+\item (b)	Decoder + word-line delay
+\item (c)	Bit-line delay
+\item (d)	Sense Amplifier delay
+\item (e)	Comparator Delay (for tag part only)
+\item (f)	H-tree output delay
+\end{itemize}
+H-tree latency (a) and (f) are mainly determined by the RC delay of global wires, which is positive proportional to the area of memory macro. Sensing delay (d) is affected by the read noise margin of memory cell that is affected by off/on resistance ratio.
+
+
+Based on these two observations, we would like to design a
 bandwidth-aware hybrid memory hierarchy, which always provides the high memory
 bandwidth with the given capacity. For example, we probably would like to use
 1) SRAM when the memory capacity is under 256MB, 2) MRAM or RRAM between
@@ -175,10 +171,15 @@ cacity is over 1GB.
 
 \section{Experiments}
 
-Based on the parameters of different cache configurations collected from our
-modified version of CACTI~\cite{CACTI}, we evaluate both pure SRAM-based and
-hybrid cache hierarchy designs. In this section, we show how bandwidth-aware
-memory hierarchy design method help with improving the system performance.
+ We will also use
+Simics~\cite{Magnusson:2002:simics-orig-paper} as the simulator to evaluate our
+design method. The benchmarks will be selected from bandwidth-bound
+applications, which possibly include benchmarks from SPEC
+CPU2006~\cite{SPEC:2006} and NPB~\cite{NPB}.\vspace{0.15in}
+
+
+
+
 
 \subsection{Experimental Setup}
 
@@ -196,7 +197,7 @@ performance, i.e., the number of cache levels that is reqired, memory technology
 used for each level, and capacity of each level.
 
 \begin{table}[t]
-  \centering  
+  \centering
   \caption{Baseline CMP configuration.}
   \vspace{0.1in}
   \begin{tabular}{l|c}
@@ -210,18 +211,18 @@ used for each level, and capacity of each level.
     Core architecture & in-order, 14-stage pipline, 2 ALUs, 2 FPUs\\
     \hline
     \multicolumn{2}{|l|}{\textbf{Memory}}\\
-    \hline    
+    \hline
     \multirow{2}{*}{Private caches} & L1 I-cache: SRAM, 8 x 64KB, 64B line, 2-way, write-through \\
                                     & L1 D-cache: SRAM, 8 x 64KB, 64B line, 2-way, write-through \\
     \hline
     \multirow{2}{*}{Shared caches} & Case 1: Pure SRAM, 64B line, 8-way, write-back \\
                                    & Case 2: Hybrid~(SRAM, MRAM, RRAM, eDRAM), 64B line, 8-way, write-back\\
-    \hline    
+    \hline
     Main memory & 4GB\\
-    \hline    
+    \hline
   \end{tabular}
   \label{table:cmp-config}
-\end{table} 
+\end{table}
 
 The benchmarks are selected from PARSEC benchmark suite~\cite{PARSEC:2008} with
 multithreaded programs, which focus on emerging workloads that are designed to
@@ -232,16 +233,16 @@ of L2 cache read per thousand instructions~(RPKI) and write per thousand
 instructions~(WPKI), which are listed in Table~\ref{table:benchmarks}.
 
 \begin{table}[htbp!]
-  \centering  
+  \centering
   \caption{Characteristics of selected benchmarks.}
   \vspace{0.1in}
   \begin{tabular}{l|c|c||l|c|c}
-    \hline    
-    \textbf{Benchmarks} & \textbf{RPKI} & \textbf{WPKI} & 
+    \hline
+    \textbf{Benchmarks} & \textbf{RPKI} & \textbf{WPKI} &
     \textbf{Benchmarks} & \textbf{RPKI} & \textbf{WPKI}\\
     \hline
     blackscholes & 22.8 & 61.7 & ferret & 5.7 & 173.4\\
-    \hline 
+    \hline
     bodytrack & 5.4 & 139.5 & fluidanimate & 2.6 & 70.1\\
     \hline
     canneal & 5.4 & 29.3 & streamcluster & 17.3 & 16.9\\
@@ -250,7 +251,7 @@ instructions~(WPKI), which are listed in Table~\ref{table:benchmarks}.
     \hline
   \end{tabular}
   \label{table:benchmarks}
-\end{table} 
+\end{table}
 
 \subsection{Results}
 
@@ -278,7 +279,7 @@ benchmark \emph{ferret}, however, pure SRAM implementation results in higher
 performance than hybrid cache implementation with the same capacity
 configuration.
 
-\begin{figure*}[t] 
+\begin{figure*}[t]
 \centering
 \includegraphics[width=3in]{figures/thput-l2l3-1}\hspace{0.2in}
 \includegraphics[width=3in]{figures/thput-l2l3-2}\\
@@ -290,7 +291,7 @@ configuration.
 \label{fig:thput-l2l3}
 \end{figure*}
 
-\begin{figure*}[t] 
+\begin{figure*}[t]
 \centering
 \includegraphics[width=3in]{figures/canneal-l2l3}\hspace{0.2in}
 \includegraphics[width=3in]{figures/ferret-l2l3}\\
@@ -323,7 +324,7 @@ than SRAM when capacity is less than 1GB. Performance of applications with large
 number of writes, such as \emph{ferret} is therefore not benefit from hybrid
 cache design.
 
-\begin{figure*}[t] 
+\begin{figure*}[t]
 \centering
 \includegraphics[width=3in]{figures/thput-l2l3l4-1}\hspace{0.2in}
 \includegraphics[width=3in]{figures/thput-l2l3l4-2}\\
@@ -337,7 +338,7 @@ cache design.
 \label{fig:thput-l2l3l4}
 \end{figure*}
 
-\begin{figure*}[t] 
+\begin{figure*}[t]
 \centering
 \includegraphics[width=3in]{figures/canneal-l2l3l4}\hspace{0.2in}
 \includegraphics[width=3in]{figures/ferret-l2l3l4}\\
@@ -349,7 +350,7 @@ cache design.
 \label{fig:benchmark-l2l3l4}
 \end{figure*}
 
-\begin{figure*}[t] 
+\begin{figure*}[t]
 \centering
 \includegraphics[width=3in]{figures/canneal}\hspace{0.2in}
 \includegraphics[width=3in]{figures/ferret}\\
@@ -372,15 +373,15 @@ applications benefit more from hybrid cache implementation in terms of
 performance.
 
 \begin{table}[htbp!]
-  \centering  
+  \centering
   \caption{Optimal cache configurations for each benchmark.}
   \vspace{0.1in}
   \begin{tabular}{|l|c|c|c|}
-    \hline    
+    \hline
     \textbf{Benchmarks} & \textbf{L2 Configuration} & \textbf{L3 Configuration} & \textbf{L4 Configuration}\\
     \hline
     blackscholes & SRAM, 8MB & eDRAM, 32MB & RRAM, 1GB\\
-    \hline 
+    \hline
     bodytrack & SRAM, 8MB & eDRAM, 128MB & -\\
     \hline
     canneal & SRAM, 8MB & eDRAM, 512MB & MRAM, 1GB\\
@@ -397,7 +398,7 @@ performance.
     \hline
   \end{tabular}
   \label{table:results}
-\end{table} 
+\end{table}
 
 \section{Conclusion and Future Work}
 In this project, we explore performance and energy characteristics of various
@@ -421,4 +422,4 @@ configurations.
 
 \end{large}
 
-\end{document} 
+\end{document}
