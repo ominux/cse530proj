@@ -16,6 +16,7 @@
 \usepackage[small,compact]{titlesec}
 \usepackage[small,it]{caption}
 \usepackage{wrapfig}
+\usepackage{multirow}
 
 \begin{document}
 
@@ -174,23 +175,245 @@ cacity is over 1GB.
 
 \section{Experiments}
 
- We will also use
-Simics~\cite{Magnusson:2002:simics-orig-paper} as the simulator to evaluate our
-design method. The benchmarks will be selected from bandwidth-bound
-applications, which possibly include benchmarks from SPEC
-CPU2006~\cite{SPEC:2006} and NPB~\cite{NPB}.\vspace{0.15in}
+Based on the parameters of different cache configurations collected from our
+modified version of CACTI~\cite{CACTI}, we evaluate both pure SRAM-based and
+hybrid cache hierarchy designs. In this section, we show how bandwidth-aware
+memory hierarchy design method help with improving the system performance.
 
 \subsection{Experimental Setup}
 
+We use Simics~\cite{Magnusson:2002:simics-orig-paper} as the simulator in our
+experiments. It is configured to model an eight-core CMP. Each core is in-order, and
+is similar to UltraSPARC III architecture. The frequency of each core is set to
+be 1GHz. Table~\ref{table:cmp-config} lists the detailed parameters of the
+baseline. Our baseline contains 8 private L1 instruction and data caches
+respectively. Since we only evaluate shared cache hierarchies, each of L1 cache
+is fixed to be SRAM-based, and of 64KB capacity. As regard to lower level
+caches, we evaluate two cases, pure SRAM-based and hybrid caches with various
+memory technologies, including SRAM, MRAM, RRAM, and eDRAM. By evaluating both
+cases, we would like to find out optimal cache design that leads to the peak
+performance, i.e., the number of cache levels that is reqired, memory technology
+used for each level, and capacity of each level.
+
+\begin{table}[t]
+  \centering  
+  \caption{Baseline CMP configuration.}
+  \vspace{0.1in}
+  \begin{tabular}{l|c}
+    \hline
+    \multicolumn{2}{|l|}{\textbf{Core}}\\
+    \hline
+    No. of cores & 8\\
+    \hline
+    Frequency & 1GHz\\
+    \hline
+    Core architecture & in-order, 14-stage pipline, 2 ALUs, 2 FPUs\\
+    \hline
+    \multicolumn{2}{|l|}{\textbf{Memory}}\\
+    \hline    
+    \multirow{2}{*}{Private caches} & L1 I-cache: SRAM, 8 x 64KB, 64B line, 2-way, write-through \\
+                                    & L1 D-cache: SRAM, 8 x 64KB, 64B line, 2-way, write-through \\
+    \hline
+    \multirow{2}{*}{Shared caches} & Case 1: Pure SRAM, 64B line, 8-way, write-back \\
+                                   & Case 2: Hybrid~(SRAM, MRAM, RRAM, eDRAM), 64B line, 8-way, write-back\\
+    \hline    
+    Main memory & 4GB\\
+    \hline    
+  \end{tabular}
+  \label{table:cmp-config}
+\end{table} 
+
+The benchmarks are selected from PARSEC benchmark suite~\cite{PARSEC:2008} with
+multithreaded programs, which focus on emerging workloads that are designed to
+be representative of next-generation shared-memory programs for CMPs. Since the
+performance of different memory technologies are closely related to read and
+write intensities, we selected some workloads that vary in the average numbers
+of L2 cache read per thousand instructions~(RPKI) and write per thousand
+instructions~(WPKI), which are listed in Table~\ref{table:benchmarks}.
+
+\begin{table}[htbp!]
+  \centering  
+  \caption{Characteristics of selected benchmarks.}
+  \vspace{0.1in}
+  \begin{tabular}{l|c|c||l|c|c}
+    \hline    
+    \textbf{Benchmarks} & \textbf{RPKI} & \textbf{WPKI} & 
+    \textbf{Benchmarks} & \textbf{RPKI} & \textbf{WPKI}\\
+    \hline
+    blackscholes & 22.8 & 61.7 & ferret & 5.7 & 173.4\\
+    \hline 
+    bodytrack & 5.4 & 139.5 & fluidanimate & 2.6 & 70.1\\
+    \hline
+    canneal & 5.4 & 29.3 & streamcluster & 17.3 & 16.9\\
+    \hline
+    facesim & 6.0 & 102.4 & swaptions & 2.6 & 121.4\\
+    \hline
+  \end{tabular}
+  \label{table:benchmarks}
+\end{table} 
+
 \subsection{Results}
 
-\section{Conclusion and Future Work}
+We evaluate various possible configurations with shared caches by simulation,
+i.e., with possible numbers of levels, memory technologies, and cache capacities
+for each cache level. We consider SRAM and eDRAM as the possible memory
+technologies to implement L2 and L3 caches. Both MRAM and RRAM have higher write
+latency than SRAM. Furthermore, the endurance of RRAM is too low to be used as
+lower level caches. Consequently, these two memory technologies are only
+considered to be used as the last level cache.
 
-In addition, we would like to put an upper bound to the total dynamic energy
-consumption of the memory hierarchy. Figure~\ref{fig:memory-energy} shows the
-estimation of dynamic power consumptions of different memory technologies with
-the provided bandwidths. In figure~\ref{fig:memory-energy}(c), we estimate the total
-dynamic energy with 10\% write activities.
+In the first set of experiments, we evaluate the system performance with
+two-level shared caches. Figure~\ref{fig:thput-l2l3} shows the system throughput
+with all the benchmarks. It is illustrated that implementing hybrid cache with
+eDRAM as the L3 cache helps with performance among most of the benchmarks. Such
+performance improvement is more than 10\% in Figure~\ref{fig:thput-l2l3}(a). It
+is indicated by our memory technology exploration that eDRAM shows more latency
+benefits with larger capacities. As a result, a larger eDRAM-based L3 cache
+leads to more performance improvement to the pure SRAM implementation, as
+illustrated by Figure~\ref{fig:thput-l2l3}(b). However, hybrid cache does not
+always improve the performance, as shown in Figure~\ref{fig:benchmark-l2l3}.
+With the benchmark \emph{canneal}, hybrid cache configurations outperform the
+pure SRAM implementation among overall range of various capacities. With the
+benchmark \emph{ferret}, however, pure SRAM implementation results in higher
+performance than hybrid cache implementation with the same capacity
+configuration.
+
+\begin{figure*}[t] 
+\centering
+\includegraphics[width=3in]{figures/thput-l2l3-1}\hspace{0.2in}
+\includegraphics[width=3in]{figures/thput-l2l3-2}\\
+\hspace{0.02in}
+\makebox[3in][l]{\bf (a)}
+\makebox[3in][l]{\bf (b)}
+\caption{Performance comparison with two-level caches among various benchmarks.
+  (a) The L3 cache capacity is 16MB. (b) The L3 cache capacity is 32MB.}
+\label{fig:thput-l2l3}
+\end{figure*}
+
+\begin{figure*}[t] 
+\centering
+\includegraphics[width=3in]{figures/canneal-l2l3}\hspace{0.2in}
+\includegraphics[width=3in]{figures/ferret-l2l3}\\
+\hspace{0.02in}
+\makebox[3in][l]{\bf (a)}
+\makebox[3in][l]{\bf (b)}
+\caption{Performance comparison with two-level caches among various cache
+  capacity. (a) The canneal benchmark. (b) The ferret benchmark.}
+\label{fig:benchmark-l2l3}
+\end{figure*}
+
+In the second set of experiments, we evaluate the system performance with
+three-level shared caches. When evaluating hybrid cache configurations, we
+consider implementing the last level cache by MRAM and RRAM memory technologies,
+since the data transaction intensity is relatively low in the last level cache.
+Figure~\ref{fig:thput-l2l3l4} shows the results.
+Figure~\ref{fig:thput-l2l3l4}(a) illustrated that the performance more than 15\%
+higher on average with a last level cache implemented by MRAM than pure SRAM
+implementations. More performance improvement is obtained by increasing the last
+level cache capacity, as shown in Figure~\ref{fig:thput-l2l3l4}(b).
+Figure~\ref{fig:benchmark-l2l3l4} compares performance with pure SRAM and hybrid
+cache implementations with different capacities. In this case, hybrid cache
+implementation leads to higher performance in both benchmarks. The results of
+the two sets of experiments are illustrated together in
+Figure~\ref{fig:benchmark-overall}. An interesting observation is that hybrid
+cache implementation shows high performance improvement with one of the
+applications \emph{canneal}, whereas as little improvement with the other
+\emph{ferret}. The reason is that write latency of both MRAM and RRAM is higher
+than SRAM when capacity is less than 1GB. Performance of applications with large
+number of writes, such as \emph{ferret} is therefore not benefit from hybrid
+cache design.
+
+\begin{figure*}[t] 
+\centering
+\includegraphics[width=3in]{figures/thput-l2l3l4-1}\hspace{0.2in}
+\includegraphics[width=3in]{figures/thput-l2l3l4-2}\\
+\hspace{0.02in}
+\makebox[3in][l]{\bf (a)}
+\makebox[3in][l]{\bf (b)}
+
+\caption{Performance comparison with three-level caches among various
+  benchmarks. (a) The L3 cache capacity is 16MB, and the L4 cache capacity is
+  512MB. (b) The L3 cache capacity is 32MB, and the L4 cache capacity is 1GB.}
+\label{fig:thput-l2l3l4}
+\end{figure*}
+
+\begin{figure*}[t] 
+\centering
+\includegraphics[width=3in]{figures/canneal-l2l3l4}\hspace{0.2in}
+\includegraphics[width=3in]{figures/ferret-l2l3l4}\\
+\hspace{0.02in}
+\makebox[3in][l]{\bf (a)}
+\makebox[3in][l]{\bf (b)}
+\caption{Performance comparison with three-level caches among various cache
+  capacity. (a) The canneal benchmark. (b) The ferret benchmark..}
+\label{fig:benchmark-l2l3l4}
+\end{figure*}
+
+\begin{figure*}[t] 
+\centering
+\includegraphics[width=3in]{figures/canneal}\hspace{0.2in}
+\includegraphics[width=3in]{figures/ferret}\\
+\hspace{0.02in}
+\makebox[3in][l]{\bf (a)}
+\makebox[3in][l]{\bf (b)}
+
+\caption{Performance comparison with both two-level and three-level caches among
+  various cache capacity. (a) The canneal benchmark. (b) The ferret benchmark.}
+\label{fig:benchmark-overall}
+\end{figure*}
+
+Finally, we evaluate all the possible cache hierarchy configurations with
+exhaustive simulations. The optimal cache configurations of each benchmark is
+shown in Table~\ref{table:results}. Since the characteristics vary among the
+benchmarks, the optimal cache configurations are different among each of
+benchmarks. Applications with high write intensities, such as \emph{bodytrack},
+\emph{ferret}, and \emph{swaptions} tend to favor SRAM-based caches. Other
+applications benefit more from hybrid cache implementation in terms of
+performance.
+
+\begin{table}[htbp!]
+  \centering  
+  \caption{Optimal cache configurations for each benchmark.}
+  \vspace{0.1in}
+  \begin{tabular}{|l|c|c|c|}
+    \hline    
+    \textbf{Benchmarks} & \textbf{L2 Configuration} & \textbf{L3 Configuration} & \textbf{L4 Configuration}\\
+    \hline
+    blackscholes & SRAM, 8MB & eDRAM, 32MB & RRAM, 1GB\\
+    \hline 
+    bodytrack & SRAM, 8MB & eDRAM, 128MB & -\\
+    \hline
+    canneal & SRAM, 8MB & eDRAM, 512MB & MRAM, 1GB\\
+    \hline
+    facesim & SRAM, 8MB & eDRAM, 32MB & MRAM, 1GB\\
+    \hline
+    ferret & SRAM, 8MB & eDRAM, 32MB & -\\
+    \hline
+    fluidanimate & SRAM, 8MB & eDRAM, 1GB & -\\
+    \hline
+    streamcluster & SRAM, 16MB & eDRAM, 128MB & MRAM, 512MB\\
+    \hline
+    swaptions & SRAM, 8MB & SRAM, 32MB & SRAM, 1GB\\
+    \hline
+  \end{tabular}
+  \label{table:results}
+\end{table} 
+
+\section{Conclusion and Future Work}
+In this project, we explore performance and energy characteristics of various
+emerging memory technolgies. Based on our exploration, we evaluate the shared
+cache hierarchy design of CMPs optimized for performance by filling the off-chip
+memory bandwidth gap. According to our evaluation, SRAM-based caches leads to
+reasonable performance with write-intensive applications. Hybrid cache design
+help with performance with other types of benchmarks.
+
+Furthermore, a variety of continuing studies is remained to be explored related
+to bandwidth-aware memory hierarchy design. First of all, we only examine cache
+hierarchy design currently. It is necessary to extend our exploration to the
+overall memory hierarchy design. On the other hand, we do not consider energy
+efficiency in this project. We would like to put some power constraints to the
+memory hierarchy, and examine the energy efficiency of various memory hierarchy
+configurations.
 
 % \bibliographystyle{IEEEtran}
 \bibliographystyle{latex8}
