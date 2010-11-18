@@ -52,29 +52,13 @@ Bandwidth-Aware Memory Hierarchy Design with Hybrid Memory Technologies}
 
 \section{Introduction}
 
-Many of modern chip-multiprocessors are designed to perform well on various
-applications to achieve high performance by exploiting their inherent
-parallelism. Such systems support large number of threads and single instruction
-multiple data~(SIMD) execution, which puts a lot of pressure on the memory
-system. Typically, memory latency is not a bottleneck, since the latency can be
-hidden via multi-threading or hardware prefetching. To this end, bandwidth
-becomes a potential bottleneck. A high rate of computing often brings in a high
-rate of data transitions. In some cases, the working set of an application fits
-in the on-die caches, which can typically provide sufficient bandwidth to keep
-up with the processing cores. However, if the working set does not fit in the
-on-die caches, the main memory needs to provide much of the data. Since the
-bandwidth of off-chip main memory is quite limited, applications with such
-working sets are potentially bandwidth-bound. Therefore, it is crucial to design
-the memory hierarchy to overcome the bandwidth limitation.
+Many of modern chip-multiprocessors are designed to perform well on various applications to achieve high performance by exploiting their inherent parallelism. Such systems support large number of threads and single instruction multiple data~(SIMD) execution, which puts a lot of pressure on the memory system. Typically, memory latency is not a bottleneck, since the latency can be hidden via multi-threading or hardware prefetching. To this end, bandwidth becomes a potential bottleneck. A high rate of computing often brings in a high rate of data transitions. In some cases, the working set of an application fits in the on-die caches, which can typically provide sufficient bandwidth to keep up with the processing cores. However, if the working set does not fit in the on-die caches, the main memory needs to provide much of the data. Since the bandwidth of off-chip main memory is quite limited, applications with such working sets are potentially bandwidth-bound. Therefore, it is crucial to design the memory hierarchy to overcome the bandwidth limitation.
 
-It is known that performance improvement of a computing system can be achieved
-via multiple memory levels. Adding an extra level of memory, however, can also
-help alleviate the bandwidth bottleneck of off-chip memory. Specifically, we
-would like to examine (1) the number of levels in the optimal memory hierarchy,
-(2) the appropriate memory technology of each level, and (3) the capacity and
-bandwidth of each level. We will also explore the energy-efficiency of the
-memory hierarchy design constrain, and the memory hierarchy design within a
-fixed power budge.\vspace{0.15in}
+It is known that performance improvement of a computing system can be achieved via multiple memory levels. Adding an extra level of memory, however, can also help alleviate the bandwidth bottleneck of off-chip memory. Specifically, we examine (1) the number of levels in the optimal memory hierarchy, (2) the appropriate memory technology of each level, and (3) the capacity and bandwidth of each level. We will also explore the energy-efficiency of the memory hierarchy design constrain, and the memory hierarchy design within a fixed power budge.
+
+Emerging memory that provides fast random access, high storage density, and non-volatility within one memory technology becomes possible  due to the emergence of  various new non-volatile memory~(NVM) technologies, such as spin-torque-transfer memory~(STT-RAM), phase-change memory~(PCRAM), and resistive memory~(RRAM).  Our goal in this project to to leverage these NVM in devising a memory system with multiple layers of the existing memory hierarchy for modern computers, to supply a wide spectrum of final products that cover from a highly latency-optimized microprocessor cache to a highly density-optimized secondary storage device.
+
+The report is organized as follows. First, we present the motivation of design a memory system with better memory bandwidth. Second, we make a quick summary of current emerging memory technologies. Then we use our NVsim, a circuit-level NVM model to evaluate the read latency, write latency and dynamic energy of different memory technologies. After that, we perform the cycle-accurate architectural simulation to find the best memory system design for different applications. Finally we conclude our work and propose potential future work.  
 
 % -----------------------------------------------------------------------------
 \section{Motivation}
@@ -152,33 +136,36 @@ provided read and write bandwidth as a function of memory capacity. Each of the 
 \begin{figure*}[htbp]
 % The "!" means to maintain the aspect ratio.
 \centering
+\includegraphics[width=6in]{figures/RAM_latency}
+\caption{Latency of different memory technologies. (a) Read Latency. (b) Write Latency.}
+\label{fig:memory-latency}
 \includegraphics[width=6in]{figures/RAM_energy}
 \caption{Dynamic energy consumption with the provided bandwidths of different
   memory technologies. (a) Dynamic Energy with 20\% write.  (b) Dynamic Energy with 50\% write. }
 \label{fig:memory-energy}
-\includegraphics[width=6in]{figures/RAM_latency}
-\caption{Latency of different memory technologies. (a) Read Latency. (b) Write Latency.}
-\label{fig:memory-latency}
 \end{figure*}
 
 Being aware that the read and write latencies of NVM are asymmetric, we consider the read latency at first. In NVsim, we divide the entire cache read latency into the following components:
 \begin{itemize}
 \item (a)	H-tree input delay
 \item (b)	Decoder + word-line delay
-\item (c)	Bit-line delay
-\item (d)	Sense Amplifier delay
-\item (e)	Comparator Delay (for tag part only)
-\item (f)	H-tree output delay
+\item (c)	Bit-line delay + Sense Amplifier delay
+\item (d)	Comparator Delay (for tag part only)
+\item (e)	H-tree output delay
 \end{itemize}
-H-tree latency (a) and (f) are mainly determined by the RC delay of global wires, which is positive proportional to the area of memory macro. Sensing delay (d) is affected by the read noise margin of memory cell that is affected by off/on resistance ratio.
+H-tree latency (a) and (f) are mainly determined by the RC delay of global wires, which is positive proportional to the area of memory macro. Sensing delay (d) is related to the read noise margin of memory cell that is affected by off/on resistance ratio. Figure~\ref{fig:memory-latency} (a) illustrates the read latency of different memories. We can see that sensing delay dominates the read latency of NVM at small capacity so that PCRAM (with the largest resistance window) is faster than RRAM and MRAM (with the smallest resistance window). While H-tree delay unveils at large capacity so that RRAM (with the smallest cell size) becomes faster than PRAM and MRAM (with the biggest cell size). The read latency of SRAM bank will increase rapidly after 128MB due to large area.
 
+Write latency of NVM are almost dominated by the write pulse width. In this work we assume 10ns, 20ns, 100ns for MRAM, RRAM and PCRAM. While write latency of SRAM and eDRAM is a function of capacity, as similar to the read latency. The results in ~\ref{fig:memory-latency} (b) indicates that NVM is suitable for memory with large capacity.
 
-Based on these two observations, we would like to design a
-bandwidth-aware hybrid memory hierarchy, which always provides the high memory
-bandwidth with the given capacity. For example, we probably would like to use
-1) SRAM when the memory capacity is under 256MB, 2) MRAM or RRAM between
-256MB and 1GB (if only bandwidth is considered), and 3) PCRAM when the memory
-cacity is over 1GB.
+Figure~\ref{fig:memory-energy} has demonstrated the dynamic energy of different memory technologies when 20\% and 50\% write access are assumed. eDRAM will be better than SRAM in terms of dynamic energy after 16MB and this is verified by IBM Power7 L3 cache. The cross-point between NVM and SRAM/eDRAM is postponed for 50\% write than 20\% write.
+
+Based on these observations, we would like to design a bandwidth-aware hybrid memory hierarchy, which always provides the high memory bandwidth with the given capacity. For example,
+\begin{itemize}
+\item eDRAM has better latency and enegry than SRAM when capacity is larger than 16MB.
+\item MRAM is more competitive to SRAM and eDRAM when capacity is larger than 128MB.
+\item PCRAM has serious endurance issue and is targeted as main memory replacement.
+\item RRAM might fit into cache hierarchy as last level cache replacement when there multiple levels of cache for applications with very few writes.
+\end{itemize}
 
 \section{Experiments}
 
