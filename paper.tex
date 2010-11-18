@@ -32,8 +32,19 @@ Bandwidth-Aware Memory Hierarchy Design with Hybrid Memory Technologies}
 \begin{large}
 
 \begin{abstract}
-\boldmath
-
+  \boldmath Chip-multiprocessor~(CMP) is a promising solution for high
+  performance computing systems. However, the limited increases in main memory
+  bandwidth results in a growing bandwidth gap between the processor cores and
+  the main memory, which becomes a potential obstacles to system performance
+  improvement. In this project, we explore bandwidth-aware memory hierarchy
+  design with various emerging memory technologies. Based on the observations
+  obtained from our pre-exploration of various emerging memory technologies, we
+  evaluate systerm performance obtained with various cache hierarchy
+  configurations. With different applications, we evaluate the optimal shared
+  cache configurations in a CMP system, in terms of the number of shared cache
+  levels, memory technology and capacity of each level. We show that cache
+  hierarchy with hybrid memory technologies benefits system performance with
+  non-write-intensive applications.
 
 \end{abstract}
 
@@ -45,16 +56,16 @@ Many of modern chip-multiprocessors are designed to perform well on various
 applications to achieve high performance by exploiting their inherent
 parallelism. Such systems support large number of threads and single instruction
 multiple data~(SIMD) execution, which puts a lot of pressure on the memory
-system. Memory latency is typically not a bottleneck, since the latency can be
-hidden via multi-threading or hardware prefetching. To this end, bandwidth becomes a
-potential bottleneck. A high rate of computing often brings in a high rate of
-data transitions. In some cases, the working set of an application fits in the
-on-die caches, which can typically provide sufficient bandwidth to keep up with
-the processing cores. However, if the working set does not fit in the on-die
-caches, the main memory needs to provide much of the data. Since the bandwidth
-of off-chip main memory is quite limited, applications with such working sets
-are potentially bandwidth-bound. Therefore, it is crucial to design the memory
-hierarchy to overcome the bandwidth limitation.
+system. Typically, memory latency is not a bottleneck, since the latency can be
+hidden via multi-threading or hardware prefetching. To this end, bandwidth
+becomes a potential bottleneck. A high rate of computing often brings in a high
+rate of data transitions. In some cases, the working set of an application fits
+in the on-die caches, which can typically provide sufficient bandwidth to keep
+up with the processing cores. However, if the working set does not fit in the
+on-die caches, the main memory needs to provide much of the data. Since the
+bandwidth of off-chip main memory is quite limited, applications with such
+working sets are potentially bandwidth-bound. Therefore, it is crucial to design
+the memory hierarchy to overcome the bandwidth limitation.
 
 It is known that performance improvement of a computing system can be achieved
 via multiple memory levels. Adding an extra level of memory, however, can also
@@ -171,15 +182,10 @@ cacity is over 1GB.
 
 \section{Experiments}
 
- We will also use
-Simics~\cite{Magnusson:2002:simics-orig-paper} as the simulator to evaluate our
-design method. The benchmarks will be selected from bandwidth-bound
-applications, which possibly include benchmarks from SPEC
-CPU2006~\cite{SPEC:2006} and NPB~\cite{NPB}.\vspace{0.15in}
-
-
-
-
+Based on the parameters of different cache configurations collected from our
+modified version of CACTI~\cite{CACTI}, we evaluate both pure SRAM-based and
+hybrid cache hierarchy designs. In this section, we show how bandwidth-aware
+memory hierarchy design method help with improving the system performance.\vspace{0.15in}
 
 \subsection{Experimental Setup}
 
@@ -202,7 +208,7 @@ used for each level, and capacity of each level.
   \vspace{0.1in}
   \begin{tabular}{l|c}
     \hline
-    \multicolumn{2}{|l|}{\textbf{Core}}\\
+    \multicolumn{2}{l}{\textbf{Core}}\\
     \hline
     No. of cores & 8\\
     \hline
@@ -210,7 +216,7 @@ used for each level, and capacity of each level.
     \hline
     Core architecture & in-order, 14-stage pipline, 2 ALUs, 2 FPUs\\
     \hline
-    \multicolumn{2}{|l|}{\textbf{Memory}}\\
+    \multicolumn{2}{l}{\textbf{Memory}}\\
     \hline
     \multirow{2}{*}{Private caches} & L1 I-cache: SRAM, 8 x 64KB, 64B line, 2-way, write-through \\
                                     & L1 D-cache: SRAM, 8 x 64KB, 64B line, 2-way, write-through \\
@@ -230,9 +236,10 @@ be representative of next-generation shared-memory programs for CMPs. Since the
 performance of different memory technologies are closely related to read and
 write intensities, we selected some workloads that vary in the average numbers
 of L2 cache read per thousand instructions~(RPKI) and write per thousand
-instructions~(WPKI), which are listed in Table~\ref{table:benchmarks}.
+instructions~(WPKI), which are listed in
+Table~\ref{table:benchmarks}.\vspace{0.3in}
 
-\begin{table}[htbp!]
+\begin{table}[t]
   \centering
   \caption{Characteristics of selected benchmarks.}
   \vspace{0.1in}
@@ -251,6 +258,7 @@ instructions~(WPKI), which are listed in Table~\ref{table:benchmarks}.
     \hline
   \end{tabular}
   \label{table:benchmarks}
+\vspace{0.5in}
 \end{table}
 
 \subsection{Results}
